@@ -13,5 +13,6 @@ router.post(
 
 router.get('/', productController.getAllProduct);
 router.get('/:id', productController.getSingleProduct);
+router.get('/:id/related', productController.getCategoryRelatedProducts);
 
 export const productRoutes = router;

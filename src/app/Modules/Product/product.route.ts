@@ -12,6 +12,7 @@ router.post(
 );
 
 router.get('/', productController.getAllProduct);
+router.get('/flashdeals', productController.getFlashDealProducts);
 router.get('/:id', productController.getSingleProduct);
 router.get('/:id/related', productController.getCategoryRelatedProducts);
 

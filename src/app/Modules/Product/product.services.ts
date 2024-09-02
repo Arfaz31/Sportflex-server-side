@@ -42,7 +42,7 @@ const getAllProductFromDB = async (query: Record<string, unknown>) => {
 
   //pagination
   // eslint-disable-next-line prefer-const
-  let limit: number = Number(query?.limit || 12);
+  let limit: number = Number(query?.limit || 15);
   let skip: number = 0;
   if (query?.page) {
     const page: number = Number(query?.page || 1);
@@ -52,10 +52,12 @@ const getAllProductFromDB = async (query: Record<string, unknown>) => {
   const skipQuery = searchQuery.skip(skip);
   const limitQuery = skipQuery.limit(limit);
 
-  //sorting
-  let sortBy = '-createdAt';
-  if (query?.sortBy) {
-    sortBy = query?.sortBy as string;
+  // Sorting
+  let sortBy = '-createdAt'; // Default sort by latest
+  if (query?.sortBy === 'price-low-high') {
+    sortBy = 'price'; // Ascending order
+  } else if (query?.sortBy === 'price-high-low') {
+    sortBy = '-price'; // Descending order
   }
   const sortQuery = limitQuery.sort(sortBy);
 
@@ -77,6 +79,26 @@ const getAllProductFromDB = async (query: Record<string, unknown>) => {
     );
   }
 
+  // Availability Filter
+  let availabilityQuery = {};
+  if (query?.availability !== undefined) {
+    availabilityQuery = { availability: query.availability === 'true' };
+  }
+
+  // Price Range Filter
+  let priceRangeQuery = {};
+  if (query.minPrice || query.maxPrice) {
+    const minPrice = Number(query.minPrice) || 0;
+    const maxPrice = Number(query.maxPrice) || Infinity;
+    priceRangeQuery = { price: { $gte: minPrice, $lte: maxPrice } };
+  }
+
+  // Brand Filter
+  let brandQuery = {};
+  if (query?.brand) {
+    brandQuery = { brand: query.brand };
+  }
+
   //exact match filtering
   const excludeFileds = [
     'searchTerm',
@@ -85,14 +107,30 @@ const getAllProductFromDB = async (query: Record<string, unknown>) => {
     'page',
     'fields',
     'categoryId',
+    'availability',
+    'minPrice',
+    'maxPrice',
+    'brand',
   ];
   excludeFileds.forEach((el) => delete queryObject[el]);
 
-  const combinedQuery = { ...queryObject, ...categoryQuery };
+  const combinedQuery = {
+    ...queryObject,
+    ...categoryQuery,
+    ...availabilityQuery,
+    ...priceRangeQuery,
+    ...brandQuery,
+  };
 
-  const filterQuery = await fieldQuery.find(combinedQuery).populate('category');
+  const products = await fieldQuery.find(combinedQuery).populate('category');
 
-  return filterQuery;
+  // Count total documents for pagination
+  const totalProducts = await Product.countDocuments(combinedQuery);
+
+  return {
+    products,
+    totalPages: Math.ceil(totalProducts / limit),
+  };
 };
 
 const getSingleProductFromDB = async (id: string) => {
@@ -115,9 +153,17 @@ const getCategoryRelatedProductsFromDB = async (excludeProductId: string) => {
   return relatedProducts;
 };
 
+const getFlashDealProductFromDB = async () => {
+  const flashProducts = await Product.find({
+    discountEndingTime: { $exists: true, $ne: '' },
+  });
+  return flashProducts;
+};
+
 export const productServices = {
   createProductIntoDB,
   getAllProductFromDB,
   getSingleProductFromDB,
   getCategoryRelatedProductsFromDB,
+  getFlashDealProductFromDB,
 };

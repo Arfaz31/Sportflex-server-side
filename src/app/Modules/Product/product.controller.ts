@@ -48,9 +48,21 @@ const getCategoryRelatedProducts = catchAsync(async (req, res) => {
   });
 });
 
+const getFlashDealProducts = catchAsync(async (req, res) => {
+  const flashDealProducts = await productServices.getFlashDealProductFromDB();
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Flash Deals products retrieved successfully',
+    data: flashDealProducts,
+  });
+});
+
 export const productController = {
   createProduct,
   getAllProduct,
   getSingleProduct,
   getCategoryRelatedProducts,
+  getFlashDealProducts,
 };

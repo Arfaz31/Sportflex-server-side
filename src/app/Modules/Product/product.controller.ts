@@ -35,7 +35,7 @@ const getSingleProduct = catchAsync(async (req, res) => {
 
 const getCategoryRelatedProducts = catchAsync(async (req, res) => {
   const { id } = req.params;
-  // Fetch related products
+
   const relatedProducts =
     await productServices.getCategoryRelatedProductsFromDB(id);
   // the id (which is the ID of the product itself).
@@ -59,10 +59,33 @@ const getFlashDealProducts = catchAsync(async (req, res) => {
   });
 });
 
+const updateProduct = catchAsync(async (req, res) => {
+  const { id } = req.params;
+  const result = await productServices.updateProductIntoDB(id, req.body);
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Product is updated successfully',
+    data: result,
+  });
+});
+const deleteProduct = catchAsync(async (req, res) => {
+  const { id } = req.params;
+  const result = await productServices.deleteProductFromDB(id);
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Product is deleted successfully',
+    data: result,
+  });
+});
+
 export const productController = {
   createProduct,
   getAllProduct,
   getSingleProduct,
   getCategoryRelatedProducts,
   getFlashDealProducts,
+  updateProduct,
+  deleteProduct,
 };

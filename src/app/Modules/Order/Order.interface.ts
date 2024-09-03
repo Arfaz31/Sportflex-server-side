@@ -9,6 +9,7 @@ import { Types } from 'mongoose';
 export type TShippingOrder = {
   productId: Types.ObjectId;
   quantity: number;
+  selectedSize?: string;
 };
 
 export type TName = {

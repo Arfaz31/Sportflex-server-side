@@ -21,4 +21,19 @@ const createProductValidationSchema = z.object({
   }),
 });
 
-export const productValidationSchema = { createProductValidationSchema };
+const updateProductValidationSchema = z.object({
+  body: z.object({
+    productName: z.string().optional(),
+    price: z.number().optional(),
+    description: z.string().optional(),
+    size: z.array(z.string()).optional(),
+    discount: z.number().optional(),
+    stockQuantity: z.number().optional(),
+    availability: z.boolean().optional(),
+  }),
+});
+
+export const productValidationSchema = {
+  createProductValidationSchema,
+  updateProductValidationSchema,
+};

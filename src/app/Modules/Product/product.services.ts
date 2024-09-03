@@ -160,10 +160,29 @@ const getFlashDealProductFromDB = async () => {
   return flashProducts;
 };
 
+const updateProductIntoDB = async (id: string, payload: Partial<TProduct>) => {
+  const result = await Product.findByIdAndUpdate({ _id: id }, payload, {
+    new: true,
+    runValidators: true,
+  });
+  return result;
+};
+const deleteProductFromDB = async (id: string) => {
+  const result = await Product.findByIdAndDelete(
+    { _id: id },
+    {
+      new: true,
+    },
+  );
+  return result;
+};
+
 export const productServices = {
   createProductIntoDB,
   getAllProductFromDB,
   getSingleProductFromDB,
   getCategoryRelatedProductsFromDB,
   getFlashDealProductFromDB,
+  updateProductIntoDB,
+  deleteProductFromDB,
 };

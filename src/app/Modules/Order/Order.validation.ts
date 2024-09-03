@@ -2,9 +2,8 @@ import { z } from 'zod';
 
 const shippingOrderValidationSchema = z.object({
   productId: z.string(),
-  // image: z.array(z.string()).min(1, 'At least one image is required'),
-  // price: z.number().min(0, 'Price must be a positive number'),
   quantity: z.number().min(1, 'Quantity must be at least 1'),
+  selectedSize: z.string().optional(),
 });
 
 const nameValidationSchema = z.object({

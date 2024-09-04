@@ -6,7 +6,6 @@ const orderDetailSchema = new Schema<TShippingOrder>({
   productId: {
     type: Schema.Types.ObjectId,
     required: [true, 'Product is required'],
-    unique: true,
     ref: Product,
   },
   quantity: {
